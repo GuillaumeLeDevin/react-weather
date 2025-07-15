@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import loader from "./assets/loader.svg"
 import browser from "./assets/browser.svg"
+import Local from "./Local/Local"
+import International from "./International/International"
 import "./App.css"
 const APIKEY = import.meta.env.VITE_WEATHER_API_KEY
 
@@ -8,9 +10,22 @@ function App() {
 
   const [weatherData, setWeatherData] = useState(null)
   const [errorInfo, setErrorInfo] = useState(null)
+  const [tabs, setTabs] = useState(0);
+  let urlFetch;
+
+    const tabsList = [
+        {name: "Local", component: <Local weatherData={weatherData} />},
+        {name: "International", component: <International apiKey={APIKEY} />}
+    ]
+    if(tabs === 0){
+      urlFetch = "http://api.airvisual.com/v2/nearest_city?key="
+     }
+     else {
+      urlFetch = "http://api.airvisual.com/v2/countries?key="
+     }
 
   useEffect(() => {
-    fetch(`http://api.airvisual.com/v2/nearest_city?key=${APIKEY}`)
+    fetch(`${urlFetch}${APIKEY}`)
     .then(response => {
       // console.log(response)
       // 400-499: Client side error
@@ -19,7 +34,7 @@ function App() {
       return response.json()
     })
     .then(responseData => {
-      console.log(responseData.data.city);
+      console.log(responseData.data);
       setWeatherData({
         city: responseData.data.city,
         country: responseData.data.country,
@@ -43,14 +58,20 @@ function App() {
 
         {weatherData && (
           <>
-              <p className="city-name">{weatherData.city}</p>
-              <p className="country-name">{weatherData.country}</p>
-              <p className="temperature">{weatherData.temperature}°</p>
-              <div className="info-icon-container">
-                <img
-                  className="info-icon"
-                  src={`./icons/${weatherData.iconId}.svg`} alt="" />
-              </div>
+            <div className="">
+            {tabsList.map((tab, index) => (
+                <button
+                onClick={() => setTabs(index)}
+                key={index}
+                className="tabs"
+                style={{backgroundColor: tabs === index ? "" : "#e2e8f0", border: tabs === index ? "2px solid #91cdebff" : ""}}>
+                    {tab.name}
+                </button>
+            ))}
+            </div>
+            <div>
+              {tabsList[tabs].component}
+            </div>
           </>
         )}
 

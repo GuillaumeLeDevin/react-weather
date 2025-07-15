@@ -1,4 +1,4 @@
-export default function Local(weatherData) {
+export default function Local({weatherData}) {
   return (
     <div>
         <p className="city-name">{weatherData.city}</p>
